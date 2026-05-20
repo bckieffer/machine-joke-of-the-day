@@ -37,8 +37,9 @@ response = client.chat.completions.create(
 )
 
 joke_text = response.choices[0].message.content.strip()
-joke_html = "\n          <br />\n          ".join(
-    line.strip() for line in joke_text.splitlines() if line.strip()
+paragraphs = "\n        ".join(
+    f"<p>{line.strip()}</p>"
+    for line in joke_text.splitlines() if line.strip()
 )
 
 index_path = os.path.join(os.path.dirname(__file__), "index.html")
@@ -46,8 +47,8 @@ with open(index_path, "r") as f:
     html = f.read()
 
 html = re.sub(
-    r'(<p id="joke">)[\s\S]*?(</p>)',
-    rf'\1\n\n          {joke_html}\n        \2',
+    r'(<article[^>]*>)[\s\S]*?(</article>)',
+    rf'\1\n        <h1 id="page-title">Machine Joke of the Day</h1>\n        {paragraphs}\n      \2',
     html,
 )
 
